@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(__file__))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import login
+from routers import login, checks
 app = FastAPI()
 
 origins = ["*"]
@@ -18,6 +18,7 @@ app.add_middleware(
 )
 #Includo le rotte
 app.include_router(login.router, prefix="/api/login", tags=['login'])
+app.include_router(checks.router, prefix="/api/check", tags=['checks'])
 
 @app.post("/")
 async def root():
