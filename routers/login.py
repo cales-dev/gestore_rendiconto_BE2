@@ -16,7 +16,6 @@ def login(response:Response, username:str = Form(), password:str = Form()):
         result = login_services.update_user_with_token(token_data['token'],
                                                token_data['refresh'],
                                                token_data['created_at'],
-                                               token_data['created_at'],#Imposto refresh con stessa data del token
                                                userInfo['id'])
         #se non true ritorna eccezione e la mostro nei log
         if result is not True:
