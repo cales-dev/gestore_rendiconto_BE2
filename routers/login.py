@@ -32,6 +32,6 @@ def login(response:Response, username:str = Form(), password:str = Form()):
         )
 
         return {'message':'ok','user':userInfo}
-    except Exception as ex:
+    except Exception as ex:  
         print(f"errore nel login: {ex}")
         raise HTTPException(status_code=500, detail="Internal server error")

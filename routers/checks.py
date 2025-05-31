@@ -30,4 +30,4 @@ def check_user_logged(response:Response, request:Request):
     
     response.set_cookie(key="token", value=new_token['token'])
 
-  return {'message':'ok','logged':True}
+  return {'message':'ok','logged':True,'user':user}
