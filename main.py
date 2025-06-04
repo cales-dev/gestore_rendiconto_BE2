@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import login, checks, report
 app = FastAPI()
 
-origins = ["*"]
+origins = ["http://localhost:4200"]
 #Gestione CORS
 app.add_middleware(
     CORSMiddleware,
