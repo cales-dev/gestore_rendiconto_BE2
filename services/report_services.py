@@ -20,15 +20,19 @@ def get_summary_data(ente):
                             
                     (SELECT COUNT(*) FROM tblverbali as tblverbali2
                         JOIN tblpagamenti as tblpagamenti2 ON tblpagamenti2.id = tblverbali2.id 
-                        WHERE tblpagamenti2.Stato LIKE 'Pagato'
+                        WHERE tblpagamenti2.Stato = 'Pagato'
+                        AND tblverbali2.id_ente=tblverbali.id_ente
                     ) AS tot_pagati, 
                     (SELECT COUNT(*) FROM tblverbali as tblverbali2
                         JOIN tblpagamenti as tblpagamenti2 ON tblpagamenti2.id = tblverbali2.id 
-                        WHERE tblpagamenti2.Stato LIKE 'Da Pagare'
+                        WHERE tblpagamenti2.Stato = 'Da Pagare'
+                        AND tblverbali2.id_ente=tblverbali.id_ente
                     ) AS tot_da_pagare, 
                     (SELECT COUNT(*) FROM tblverbali as tblverbali2
                         JOIN tblpagamenti as tblpagamenti2 ON tblpagamenti2.id = tblverbali2.id 
-                        WHERE tblpagamenti2.Stato LIKE 'Rimborso') AS tot_rimborso
+                        WHERE tblpagamenti2.Stato = 'Rimborso'
+                        AND tblverbali2.id_ente=tblverbali.id_ente
+                    )  AS tot_rimborso
                             
                     FROM tblverbali
                     JOIN tblcontratti ON tblverbali.id = tblcontratti.id
