@@ -2,7 +2,6 @@ from db import db_connection
 
 def get_summary_data(ente):
     dbConnection = db_connection.db_connection()
-    print(ente)
     try:
         with dbConnection.cursor() as cur:
             if(ente):
@@ -60,6 +59,26 @@ def get_summary_data(ente):
                     GROUP BY tblverbali.id, 
                     tblcontratti.rifcomune
                 """)
+
+            results = cur.fetchall()
+            return results 
+    finally:
+        dbConnection.close()
+
+def get_details_data(ente):
+    dbConnection = db_connection.db_connection()
+    print(ente)
+    try:
+        with dbConnection.cursor() as cur:
+            cur.execute("""
+                SELECT 
+                *
+                FROM tblverbali
+                JOIN tblpagamenti ON tblpagamenti.id = tblverbali.id
+                JOIN tblspese ON tblspese.id_verbale = tblverbali.id
+                WHERE tblverbali.id_ente = %s
+            """, 
+            (ente,))
 
             results = cur.fetchall()
             return results 
