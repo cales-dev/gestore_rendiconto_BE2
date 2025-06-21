@@ -15,6 +15,6 @@ def validate_user_token(token):
     return {'status_code':401, 'detail':"Invalid token"} 
   
   if user_status=="refresh":
-    return {'status_code':200,'refresh':True}
+    return {'status_code':200,'refresh':True, 'user':user}
 
   return {'status_code':200, 'message':'ok','logged':True,'user':user}

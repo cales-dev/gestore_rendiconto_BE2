@@ -14,7 +14,6 @@ router = APIRouter()
 @auth_wrapper
 async def get_summary(request: Request, response: Response, ente: Optional[str] = None):
     try: 
-        print(ente)
         summary_data = get_summary_data(ente)
         return {'ok':True, 'result':summary_data}
     except Exception as ex:
@@ -26,7 +25,6 @@ async def get_summary(request: Request, response: Response, ente: Optional[str] 
 @auth_wrapper
 async def get_details(request:Request, response:Response, ente:int):
     try:
-        print(ente)
         details_data = get_details_data(ente)
         return {'ok':True, 'result':details_data}
     except Exception as ex:

@@ -12,7 +12,6 @@ def login(response:Response, username:str = Form(), password:str = Form()):
             raise HTTPException(status_code=401, detail="Credenziali errate")
         
         token_data = token_handler.gen_token()
-        print(userInfo)
         result = login_services.update_user_with_token(token_data['token'],
                                                token_data['refresh'],
                                                token_data['created_at'],

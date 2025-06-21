@@ -9,13 +9,13 @@ router = APIRouter()
 def check_user_logged(response:Response, request:Request):
   token=request.cookies.get("token")
   check_user=validate_user_token(token)
-  match check_user:
+  match check_user['status_code']:
     case 401:
       raise HTTPException(status_code=check_user['status_code'], detail=check_user['detail'])
     case 200:
-      if check_user['refresh'] is True:
+      if check_user.get('refresh') is True:
         new_token=gen_token()#genero nuovo token, refresh viene generato ma non aggiornato su db
-        result = update_token(new_token['token'], new_token['created_at'], user['id'])
+        result = update_token(new_token['token'], new_token['created_at'], check_user['user']['id'])
 
         #se non true ritorna eccezione e la mostro nei log
         if result is not True:
