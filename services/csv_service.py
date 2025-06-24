@@ -4,7 +4,7 @@ import io
 
 def generate_export(record_set, field_order=None, field_labels=None):
     output = io.StringIO()
-    writer = csv.writer(output)
+    writer = csv.writer(output, delimiter=";")
 
     if not record_set:
         return ""
