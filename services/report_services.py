@@ -40,7 +40,7 @@ def get_summary_data(ente):
                             
                     FROM tblverbali
                     JOIN tblcontratti ON tblverbali.id_ente = tblcontratti.id
-                    JOIN tblpagamenti ON tblpagamenti.id = tblverbali.id
+                    JOIN tblpagamenti ON tblpagamenti.id_verbale = tblverbali.id
                     WHERE tblcontratti.rifcomune = %s
                     GROUP BY tblverbali.id_ente, 
                     tblverbali.id, 
@@ -61,7 +61,7 @@ def get_summary_data(ente):
                         COUNT(tblverbali.id) AS num_verbali
                     FROM tblverbali
                     JOIN tblcontratti ON tblverbali.id_ente = tblcontratti.id  
-                    JOIN tblpagamenti ON tblpagamenti.id = tblverbali.id
+                    JOIN tblpagamenti ON tblpagamenti.id_verbale = tblverbali.id
                     GROUP BY 
                         tblverbali.id_ente,
                         tblcontratti.rifcomune
