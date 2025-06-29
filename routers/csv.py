@@ -1,10 +1,23 @@
 from typing import Optional
 from fastapi import APIRouter, File, Form, HTTPException, Request,Response, UploadFile
-from services import report_services, csv_service
+from services import report_services, csv_service, temptable_service
 from wrapper.auth_wrapper import auth_wrapper
 import csv
 import io
 
+EXPECTED_FIELD=[
+        "Id Verbale",
+        "Stato Verbale",
+        "Importo Pagato",
+        "Data Pagamento",
+        "Tipo Importo",
+        "Importo Sanzione",
+        "Spese di procedura",
+        "Spese Postali",
+        "Spese Comando",
+        "Da Rimborsare"
+]
+    
 
 router = APIRouter()
 
@@ -38,23 +51,11 @@ async def generate_export_csv(request: Request, response: Response, ente: int=Fo
         return response
     except Exception as  ex:
         print(ex)
-        raise HTTPException(500)
+        raise HTTPException(status_code=500)
         
 @router.post("/upload/")
 @auth_wrapper
 async def upload_csv(request: Request, response: Response, ente: int=Form(), csv_file: UploadFile=File()):
-    expected_filed=[
-        "Id Verbale",
-        "Stato Verbale",
-        "Importo Pagato",
-        "Data Pagamento",
-        "Tipo Importo",
-        "Importo Sanzione",
-        "Spese di procedura",
-        "Spese Postali",
-        "Spese Comando",
-        "Da Rimborsare"
-    ]
     try:
         if not ente:
             raise HTTPException(400, detail="Campo ente mancante")
@@ -70,17 +71,35 @@ async def upload_csv(request: Request, response: Response, ente: int=Form(), csv
         if header is None:
             HTTPException(400, "File vuoto")
 
-        missing = list(set(expected_filed) - set(header))
+        missing = list(set(EXPECTED_FIELD) - set(header))
         if missing:
             raise HTTPException(status_code=400, detail="Missing required columns: " + ", ".join(missing))
 
         results = []
         for row in read_content:
-           #validazione righe
-           appo=0
+            #validazione righe
+            checked_row, errors=csv_service.validate_row(row, header)
+            if errors != "":
+                raise HTTPException(status_code=400, detail=f"Il csv non rispetta i controlli in particolare: {errors}")
+            
+            results.append(checked_row)
 
+
+        create_table_result=temptable_service.create_temp_table_if_not_exists()
+        if create_table_result is not True:
+            print(create_table_result)
+            raise HTTPException(status_code=500, detail=create_table_result)
+        
+        insert_table_result=temptable_service.insert_into_temp_table()
+        if insert_table_result is not True:
+            print(insert_table_result)
+            raise HTTPException(status_code=500, detail=create_table_result)
+            
         #TODO metodo per crezione tabella temporanea e inserimento dei dati
         return {"message": "CSV processed successfully", "count": len(results)}
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as  ex:
         print(ex)
-        raise HTTPException(500)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+        
