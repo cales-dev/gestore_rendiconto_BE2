@@ -33,12 +33,15 @@ def get_user_from_db(username, password):
                 (username,)
             )
             user = cursor.fetchone()
-            #Controllo password in chiaro corrisponda con hash su db
-            if(check_password(password, user['password'])):
-                userInfo={"id":user['id'],"username":user['username']} #passo solo info non sensibili
-                return userInfo
             
-            return None
+            if user is not None:
+                #Controllo password in chiaro corrisponda con hash su db
+                if(check_password(password, user['password'])):
+                    userInfo={"id":user['id'],"username":user['username']} #passo solo info non sensibili
+                    return userInfo
+                
+            return False
+    
     finally:
         dbConnection.close()
 

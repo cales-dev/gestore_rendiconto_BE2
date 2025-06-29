@@ -8,7 +8,7 @@ def login(response:Response, username:str = Form(), password:str = Form()):
     try:
         userInfo = login_services.get_user_from_db(username, password)
 
-        if not userInfo:
+        if userInfo is False:
             raise HTTPException(status_code=401, detail="Credenziali errate")
         
         token_data = token_handler.gen_token()
@@ -31,6 +31,8 @@ def login(response:Response, username:str = Form(), password:str = Form()):
         )
 
         return {'message':'ok','user':userInfo}
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as ex:  
         print(f"errore nel login: {ex}")
         raise HTTPException(status_code=500, detail="Internal server error")
