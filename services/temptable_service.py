@@ -1,8 +1,9 @@
 from db import db_connection
+from datetime import datetime
 import csv
 import io
 
-
+#Metodo che genera la tabella temporanea 
 def create_temp_table_if_not_exists():
     try:
         
@@ -33,11 +34,61 @@ def create_temp_table_if_not_exists():
     finally:
         dbConnection.close()
    
-def insert_into_temp_table():
+#Metodo che inserisce i dati nella tabella temporanea 
+def insert_into_temp_table(results):
     try:
         dbConnection = db_connection.db_connection()
         with dbConnection.cursor() as cursor:
+            #Svuoto la tabella ad ogni inserimento
+            cursor.execute("TRUNCATE TABLE temp_rendicontazione")
 
+            sql = '''
+                    INSERT INTO temp_rendicontazione (
+                        id_verbale,
+                        id_pagamento,
+                        stato_verbale,
+                        importo_pagato,
+                        data_pagamento,
+                        tipo_importo,
+                        importo_sanzione,
+                        spese_procedura,
+                        spese_postali,
+                        spese_comando,
+                        da_rimborsare
+                    ) VALUES (
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    );
+            '''
+
+            for row in results:
+                row["Data Pagamento"] = datetime.strptime(row["Data Pagamento"], "%d/%m/%Y").date()
+                cursor.execute(
+                    sql,(
+                        row['Id Verbale'],
+                        row['Id Pagamento'],
+                        row['Stato Verbale'],
+                        row['Importo Pagato'],
+                        row['Data Pagamento'],
+                        row['Tipo Importo'],
+                        row['Importo Sanzione'],
+                        row['Spese di procedura'],
+                        row['Spese Postali'],
+                        row['Spese Comando'],
+                        row['Da Rimborsare']
+                    )
+                )
+            
+            dbConnection.commit() 
             return True
     except Exception as ex:
         return ex

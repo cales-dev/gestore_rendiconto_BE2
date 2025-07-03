@@ -5,7 +5,9 @@ from wrapper.auth_wrapper import auth_wrapper
 import csv
 import io
 
+#campi validi nel csv
 EXPECTED_FIELD=[
+        "Id Pagamento",
         "Id Verbale",
         "Stato Verbale",
         "Importo Pagato",
@@ -21,6 +23,7 @@ EXPECTED_FIELD=[
 
 router = APIRouter()
 
+#Metodo che esporta il csv permettendo all'operatore la modifica dei dati 
 @router.post("/export/")
 @auth_wrapper
 async def generate_export_csv(request: Request, response: Response, ente: int=Form()):
@@ -54,6 +57,7 @@ async def generate_export_csv(request: Request, response: Response, ente: int=Fo
         print(ex)
         raise HTTPException(status_code=500)
         
+#Metodo che carica e controlla i dati presi dal csv dell'operatore nella tabella temporanea
 @router.post("/upload/")
 @auth_wrapper
 async def upload_csv(request: Request, response: Response, ente: int=Form(), csv_file: UploadFile=File()):
@@ -70,12 +74,16 @@ async def upload_csv(request: Request, response: Response, ente: int=Form(), csv
 
         header=next(read_content, None)
         if header is None:
-            HTTPException(400, "File vuoto")
-
+            raise HTTPException(400, "File vuoto")
+        
         missing = list(set(EXPECTED_FIELD) - set(header))
         if missing:
-            raise HTTPException(status_code=400, detail="Missing required columns: " + ", ".join(missing))
+            raise HTTPException(status_code=400, detail="Intestazioni mancanti: " + ", ".join(missing))
 
+        invalid_header = list(set(header) - set(EXPECTED_FIELD))
+        if invalid_header:
+            raise HTTPException(status_code=400, detail="Instestazioni non valide: " + ", ".join(invalid_header))
+        
         results = []
         for row in read_content:
             #validazione righe
@@ -85,13 +93,15 @@ async def upload_csv(request: Request, response: Response, ente: int=Form(), csv
             
             results.append(checked_row)
 
-
+        #creo la tabella temporanea e leggo l'errore dal metodo se presente
         create_table_result=temptable_service.create_temp_table_if_not_exists()
         if create_table_result is not True:
             print(create_table_result)
             raise HTTPException(status_code=500, detail=create_table_result)
         
-        insert_table_result=temptable_service.insert_into_temp_table()
+        print(results)
+        #inserisco i dati neòla tabella temporanea e leggo l'errore dal metodo se presente
+        insert_table_result=temptable_service.insert_into_temp_table(results)
         if insert_table_result is not True:
             print(insert_table_result)
             raise HTTPException(status_code=500, detail=create_table_result)

@@ -65,7 +65,7 @@ def validate_row(row, header):
         "Da Rimborsare"
     ]
     for campo in numerici:
-        valore = row.get(campo, "").replace(".", "").replace(",", ".").strip()
+        valore = row.get(campo, "").strip()
         try:
             importo = float(valore) if valore else 0.0
         except ValueError:
@@ -94,4 +94,4 @@ def validate_row(row, header):
     # if data_db and data_db != data_csv:
     #     return False, f"La Data Pagamento non corrisponde a quella registrata per il verbale {id_verbale}"
 
-    return True, ""
+    return row, ""
