@@ -13,6 +13,7 @@ def create_temp_table_if_not_exists():
                     CREATE TABLE IF NOT EXISTS temp_rendicontazione (
                     ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                     id_verbale BIGINT NOT NULL,
+                    id_pagamento BIGINT NOT NULL,
                     stato_verbale VARCHAR(255),
                     importo_pagato DECIMAL(10,2),
                     data_pagamento DATE,

@@ -26,15 +26,16 @@ router = APIRouter()
 async def generate_export_csv(request: Request, response: Response, ente: int=Form()):
     try:
         results = report_services.get_details_data(ente)
-
+        print(results)
         csv_data = csv_service.generate_export(
             results,
             field_order=[
-                "id", "stato", "importo_pagato", "data_pagamento", "tipo",
+                "id_pagamento", "id_verbale", "stato", "importo_pagato", "data_pagamento", "tipo",
                 "importo", "speseprocedura", "spesepostali", "spesecomando", "rimborso"
             ],
             field_labels={
-                "id": "Id Verbale",
+                "id_pagamento": "Id Pagamento",
+                "id_verbale": "Id Verbale",
                 "stato": "Stato Verbale",
                 "importo_pagato": "Importo Pagato",
                 "data_pagamento": "Data Pagamento",

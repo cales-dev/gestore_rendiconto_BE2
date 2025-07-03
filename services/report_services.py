@@ -78,7 +78,17 @@ def get_details_data(ente):
         with dbConnection.cursor() as cur:
             cur.execute("""
                 SELECT 
-                *
+                tblpagamenti.id as id_pagamento, 
+                tblverbali.id as id_verbale,
+                stato,
+                importo_pagato,
+                data_pagamento,
+                tipo,
+                importo,
+                speseprocedura,
+                spesepostali,
+                spesecomando,
+                rimborso
                 FROM tblpagamenti
                 JOIN tblverbali ON tblpagamenti.id_verbale = tblverbali.id
                 JOIN tblspese ON tblspese.id_verbale = tblverbali.id
