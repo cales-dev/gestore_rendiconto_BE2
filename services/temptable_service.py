@@ -94,3 +94,59 @@ def insert_into_temp_table(results):
         return ex
     finally:
         dbConnection.close()
+
+#Metodo che ritorna i dati nella tabella temporanea
+def get_temp_table_data():
+    try:
+        
+        dbConnection = db_connection.db_connection()
+        #seleziono utente
+        with dbConnection.cursor() as cursor:
+            cursor.execute('''
+                   SELECT * FROM temp_rendicontazione;
+            ''')
+
+            temp_data = cursor.fetchall()
+            return temp_data
+    except Exception as ex:
+            return ex
+    finally:
+        dbConnection.close()
+
+#Metodo che salva i dati della tabella temporanea nella tblpagamenti
+def save_temp_data():
+    try:
+        dbConnection = db_connection.db_connection()
+        #seleziono utente
+        with dbConnection.cursor() as cursor:
+            #Aggiorno tblpagamenti con dati su temp
+            sql = '''
+                UPDATE tblpagamenti AS pagamenti
+                SET 
+                    importo_pagato = COALESCE(tmp.importo_pagato, 0),
+                    rimborso = COALESCE(tmp.da_rimborsare, 0)
+                FROM temp_rendicontazione AS tmp
+                WHERE pagamenti.ID = tmp.id_pagamento
+            '''
+            cursor.execute(sql)
+            
+            #Aggiorno tblspese con dati su temp
+            sql2 = '''
+                UPDATE tblspese AS spese
+                SET 
+                    speseprocedura = COALESCE(tmp.spese_procedura, 0),
+                    spesecomando = COALESCE(tmp.spese_comando, 0),
+                    spesepostali = COALESCE(tmp.spese_postali, 0)
+                FROM tblpagamenti AS pagamenti
+                JOIN temp_rendicontazione AS tmp ON pagamenti.ID = tmp.id_pagamento
+                WHERE spese.id_verbale = pagamenti.id_verbale
+            '''
+            cursor.execute(sql2)
+
+            dbConnection.commit()
+            return True
+    except Exception as ex:
+            print(ex)
+            return ex
+    finally:
+        dbConnection.close()
