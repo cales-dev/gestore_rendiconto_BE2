@@ -1,37 +1,24 @@
-from db import db_connection
-from datetime import date, datetime
+from datetime import datetime
+import pandas as pd
 import csv
 import io
 import re
 
-def generate_export(record_set, field_order=None, field_labels=None):
-    output = io.StringIO()
-    writer = csv.writer(output, delimiter=";")
+def generate_export(record_set, field_labels=None):
+    dataFrame= pd.DataFrame(record_set)
 
-    if not record_set:
-        return ""
+    #cerco data_pagamento e adatto il formato
+    if 'data_pagamento' in dataFrame.columns:
+           dataFrame['data_pagamento'] = pd.to_datetime(dataFrame['data_pagamento']).dt.strftime('%d/%m/%Y')
 
-    # Determina intestazioni ordinate
-    if field_order:
-        headers = [field_labels.get(k, k) for k in field_order]
-        writer.writerow(headers)
-        for row in record_set:
-            formatted_row=[]
-            for key in field_order:
-                value = row.get(key)
-                if key=="data_pagamento":
-                    value=value.strftime("%d/%m/%Y")
-                formatted_row.append(value)
-            writer.writerow(formatted_row)
-    # else:
-    #     # Se non specificato, usa chiavi del primo record
-    #     headers = list(record_set[0].keys())
-    #     writer.writerow(headers)
-    #     for row in record_set:
-    #         writer.writerow([row.get(k, "") for k in headers])
+    #uso field_labels per rinominare le intestazioni
+    if field_labels:
+        dataFrame = dataFrame.rename(columns=field_labels)
 
-    return output.getvalue()
-
+    #Ritorno CSV
+    buffer = io.StringIO()
+    dataFrame.to_csv(buffer, index=False, sep=';')
+    return buffer.getvalue()
 
 def validate_row(row, header):
     #Normalizzo e mappo i valodi del csv con gli header
@@ -79,7 +66,6 @@ def validate_row(row, header):
     if not data_str:
         return False, f"Data Pagamento mancante per il verbale {id_verbale}"
 
-    from datetime import datetime
     try:
         data_csv = datetime.strptime(data_str, "%d/%m/%Y").date()
     except ValueError:

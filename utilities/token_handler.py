@@ -1,5 +1,4 @@
 import secrets
-import pytz
 from datetime import timedelta, datetime
 
 #Date di scandenza dei toke, rispettivamente 1 ora e 2 settimane

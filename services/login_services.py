@@ -1,4 +1,3 @@
-import psycopg2
 from db import db_connection
 from utilities.security import check_password
 

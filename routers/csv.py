@@ -1,10 +1,8 @@
-from typing import Optional
 from fastapi import APIRouter, File, Form, HTTPException, Request,Response, UploadFile
 from services import report_services, csv_service, temptable_service
 from wrapper.auth_wrapper import auth_wrapper
 import csv
 import io
-
 #campi validi nel csv
 EXPECTED_FIELD=[
         "Id Pagamento",
@@ -32,10 +30,6 @@ async def generate_export_csv(request: Request, response: Response, ente: int=Fo
         print(results)
         csv_data = csv_service.generate_export(
             results,
-            field_order=[
-                "id_pagamento", "id_verbale", "stato", "importo_pagato", "data_pagamento", "tipo",
-                "importo", "speseprocedura", "spesepostali", "spesecomando", "rimborso"
-            ],
             field_labels={
                 "id_pagamento": "Id Pagamento",
                 "id_verbale": "Id Verbale",

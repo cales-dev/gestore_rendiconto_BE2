@@ -1,7 +1,5 @@
 from db import db_connection
 from datetime import datetime
-import csv
-import io
 
 #Metodo che genera la tabella temporanea 
 def create_temp_table_if_not_exists():

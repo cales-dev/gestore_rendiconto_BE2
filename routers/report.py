@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, Request,Response
+from fastapi import APIRouter, HTTPException, Request,Response
 from wrapper.auth_wrapper import auth_wrapper
 from services.report_services import get_summary_data, get_details_data
 from services.temptable_service import get_temp_table_data, save_temp_data
