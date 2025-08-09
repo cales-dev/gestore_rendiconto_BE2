@@ -20,8 +20,9 @@ async def get_summary(request: Request, response: Response, ente: Optional[str] 
     except Exception as ex:
         print(f"Errore report/summary/: {ex}")
         raise HTTPException(status_code=500, detail="Errore durante l'estrazione del report")
-    
-
+"""
+    Metodo che restituisce il dettaglio di uno specifico ente
+"""
 @router.get("/details/{ente}")
 @auth_wrapper
 async def get_details(request:Request, response:Response, ente:int):
@@ -31,7 +32,10 @@ async def get_details(request:Request, response:Response, ente:int):
     except Exception as ex:
         print(f"Errore report/details/: {ex}")
         raise HTTPException(status_code=500, detail="Errore durante l'estrazione del dettaglio")
-    
+"""
+    Metodo richiamato dopo aver caricato il fil csv,
+    restituisce le info salvate su temp_rendicontazione
+"""
 @router.get("/temp/")
 @auth_wrapper
 async def get_temp_table_info(request:Request, response:Response):
@@ -41,7 +45,10 @@ async def get_temp_table_info(request:Request, response:Response):
     except Exception as ex:
         print(f"Errore report/details/: {ex}")
         raise HTTPException(status_code=500, detail="Errore durante l'estrazione del dettaglio")
-
+"""
+    Metodo che salva le info riportate su temp_rendicontazione
+    in tblpagamenti.
+"""
 @router.post("/save/")
 @auth_wrapper
 async def save_temp_info(request:Request, response:Response):

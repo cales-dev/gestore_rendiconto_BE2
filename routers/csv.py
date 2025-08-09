@@ -26,8 +26,10 @@ router = APIRouter()
 @auth_wrapper
 async def generate_export_csv(request: Request, response: Response, ente: int=Form()):
     try:
+        #risultato query
         results = report_services.get_details_data(ente)
-        print(results)
+        #metodo che genera il csv, utilizza pandas per prendere il risultato della query e
+        #generare il csv, field_labels rinomina gli elementi per renderli più leggibili
         csv_data = csv_service.generate_export(
             results,
             field_labels={
@@ -92,16 +94,14 @@ async def upload_csv(request: Request, response: Response, ente: int=Form(), csv
         if create_table_result is not True:
             print(create_table_result)
             raise HTTPException(status_code=500, detail=create_table_result)
-        
-        print(results)
+
         #inserisco i dati neòla tabella temporanea e leggo l'errore dal metodo se presente
         insert_table_result=temptable_service.insert_into_temp_table(results)
         if insert_table_result is not True:
             print(insert_table_result)
             raise HTTPException(status_code=500, detail=create_table_result)
             
-        #TODO metodo per crezione tabella temporanea e inserimento dei dati
-        return {"message": "CSV processed successfully", "count": len(results)}
+        return {"message": "CSV upload done", "count_rows": len(results)}
     except HTTPException as http_ex:
         raise http_ex
     except Exception as  ex:
