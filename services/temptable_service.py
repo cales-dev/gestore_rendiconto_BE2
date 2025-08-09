@@ -118,7 +118,7 @@ def save_temp_data():
         #seleziono utente
         with dbConnection.cursor() as cursor:
             #Aggiorno tblpagamenti con dati su temp
-            sql = '''
+            sql_pagamenti = '''
                 UPDATE tblpagamenti AS pagamenti
                 SET 
                     importo_pagato = COALESCE(tmp.importo_pagato, 0),
@@ -126,10 +126,10 @@ def save_temp_data():
                 FROM temp_rendicontazione AS tmp
                 WHERE pagamenti.ID = tmp.id_pagamento
             '''
-            cursor.execute(sql)
+            cursor.execute(sql_pagamenti)
             
             #Aggiorno tblspese con dati su temp
-            sql2 = '''
+            sql_spese = '''
                 UPDATE tblspese AS spese
                 SET 
                     speseprocedura = COALESCE(tmp.spese_procedura, 0),
@@ -139,7 +139,17 @@ def save_temp_data():
                 JOIN temp_rendicontazione AS tmp ON pagamenti.ID = tmp.id_pagamento
                 WHERE spese.id_verbale = pagamenti.id_verbale
             '''
-            cursor.execute(sql2)
+            cursor.execute(sql_spese)
+
+            #Aggiorno tblverbali con dati su temp
+            sql_verbali = '''
+                UPDATE tblverbali AS verbali
+                SET 
+                    importo = COALESCE(tmp.importo_sanzione, 0)
+                FROM temp_rendicontazione AS tmp
+                WHERE verbali.id = tmp.id_verbale
+            '''
+            cursor.execute(sql_verbali)
 
             dbConnection.commit()
             return True
